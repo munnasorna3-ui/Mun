@@ -3,10 +3,9 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>MK Power Solutions — Pro</title>
+<title>Mk Power Solutions</title>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.3.0/dist/chart.umd.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 <style>
 :root{
@@ -16,349 +15,719 @@
   --card:#ffffff;
   --text:#222;
   --muted:#777;
-  --sidebar:280px;
+  --sidebar:300px;
 }
 *{box-sizing:border-box}
 html,body{margin:0;height:100%;font-family:Poppins,Arial;background:var(--bg);color:var(--text)}
 
-.topbar{position:fixed;top:0;left:0;right:0;height:64px;background:linear-gradient(180deg,var(--red),var(--red2));color:#fff;display:flex;align-items:center;gap:12px;padding:0 14px;z-index:1000}
+/* ===== TOPBAR ===== */
+.topbar{
+  position:fixed;top:0;left:0;right:0;height:64px;
+  background:linear-gradient(180deg,var(--red),var(--red2));
+  color:#fff;display:flex;align-items:center;gap:12px;
+  padding:0 14px;z-index:1000
+}
 .hambtn{width:44px;height:44px;border-radius:8px;background:rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;cursor:pointer}
 .brand{font-weight:700}
 .top-actions{margin-left:auto;display:flex;gap:8px;align-items:center}
-.btn{border:none;border-radius:8px;padding:10px 14px;cursor:pointer}
+.pill{background:rgba(255,255,255,.15);padding:8px 12px;border-radius:20px;font-size:14px}
+.btn{border:none;border-radius:8px;padding:8px 12px;cursor:pointer}
 .btn-red{background:#fff;color:#7a1c1c;font-weight:600}
-.btn-outline{background:transparent;border:1px solid #7a1c1c;color:#7a1c1c}
 
+/* ===== LAYOUT ===== */
 .app{display:flex;padding-top:64px;min-height:100vh}
-.sidebar{position:fixed;top:64px;bottom:0;left:0;width:var(--sidebar);background:#fff;border-right:1px solid #e6e6e6;overflow:auto;transition:.25s}
+.sidebar{
+  position:fixed;top:64px;bottom:0;left:0;width:var(--sidebar);
+  background:#fff;border-right:1px solid #e6e6e6;
+  overflow:auto;transition:.25s;z-index:900
+}
 .sidebar.hide{transform:translateX(-100%)}
 .content{flex:1;margin-left:var(--sidebar);padding:18px;transition:.25s}
 .content.full{margin-left:0}
-@media(max-width:900px){.sidebar{width:85%}.content{margin-left:0}}
 
+@media(max-width:900px){
+  .sidebar{width:85%;max-width:360px}
+  .content{margin-left:0}
+}
+
+/* ===== SIDEBAR ===== */
 .company{background:linear-gradient(90deg,var(--red),#9b2a2a);color:#fff;padding:12px 16px;font-weight:600}
 .nav{padding:10px}
-.nav-item{padding:10px;border-radius:8px;cursor:pointer}
+.nav-item{padding:10px;border-radius:8px;cursor:pointer;display:flex;gap:10px;align-items:center}
 .nav-item:hover{background:#f3f3f3}
+.sub{display:none;padding-left:18px}
+.sub div{padding:8px;border-radius:6px;cursor:pointer}
+.sub div:hover{background:#f0f0f0}
+.open + .sub{display:block}
 
+/* ===== CARDS ===== */
 .card{background:var(--card);border-radius:10px;padding:16px;margin-bottom:16px;box-shadow:0 2px 6px rgba(0,0,0,.05)}
 .grid{display:grid;grid-template-columns:repeat(12,1fr);gap:16px}
 .c4{grid-column:span 4}
 .c6{grid-column:span 6}
 .c12{grid-column:span 12}
 @media(max-width:900px){.c4,.c6{grid-column:span 12}}
+.kpi{font-size:28px;font-weight:700}
+.muted{color:var(--muted)}
 
-input,select,textarea{padding:10px;border-radius:8px;border:1px solid #ddd;width:100%}
+/* ===== TABLE ===== */
 table{width:100%;border-collapse:collapse}
-th,td{padding:10px;border-bottom:1px solid #eee;font-size:14px}
+th,td{padding:10px;border-bottom:1px solid #eee;text-align:left;font-size:14px}
+
+/* ===== FORMS ===== */
+input,select,textarea{padding:10px;border-radius:8px;border:1px solid #ddd;width:100%}
 .row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 @media(max-width:700px){.row{grid-template-columns:1fr}}
+.form-section{margin-bottom:12px}
+.small{font-size:13px;color:var(--muted)}
+.items-table th, .items-table td{padding:8px;border:1px solid #eee;text-align:left}
+.items-table{width:100%;border-collapse:collapse;margin-top:8px}
+.total-row{display:flex;justify-content:flex-end;gap:10px;align-items:center;margin-top:8px}
 
+/* UTIL */
+.text-right{text-align:right}
+.badge{display:inline-block;padding:4px 8px;border-radius:999px;background:#f0f0f0;font-size:12px}
 .page{display:none}
 .page.active{display:block}
-.small{font-size:12px;color:#666}
-
-.login-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center}
-.login-box{max-width:440px;width:95%;background:#fff;padding:24px;border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,.08)}
-.login-box h2{margin-top:0}
-.switch-link{color:#7a1c1c;cursor:pointer;font-size:14px;text-decoration:underline}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;align-items:center;justify-content:center;z-index:2000}
+.modal.show{display:flex}
+.modal-box{background:#fff;border-radius:12px;padding:18px;width:92%;max-width:520px}
+.toast{position:fixed;right:18px;bottom:18px;background:#222;color:#fff;padding:10px 14px;border-radius:8px;box-shadow:0 6px 18px rgba(0,0,0,.18);display:none;z-index:3000}
+.toast.show{display:block}
+.actions-row{display:flex;gap:8px;flex-wrap:wrap}
+.icon-btn{border:none;background:#f5f5f5;padding:6px;border-radius:8px;cursor:pointer}
+.small-muted{font-size:12px;color:#666}
 </style>
 </head>
 
 <body>
 
-<!-- ===== LOGIN / REGISTER ===== -->
-<div id="loginWrap" class="login-wrap">
-  <div class="login-box" id="loginBox">
-    <h2>MK Power Pro — Login</h2>
-    <input id="loginUser" placeholder="Username"><br><br>
-    <input id="loginPass" type="password" placeholder="Password"><br><br>
-    <button class="btn btn-red" onclick="login()">Login</button>
-    <br><br>
-    <div class="small">No account? <span class="switch-link" onclick="showRegister()">Create account</span></div>
-    <div class="small">Default first-time login: <b>admin / 1234</b></div>
-  </div>
-
-  <div class="login-box" id="registerBox" style="display:none">
-    <h2>Create Account</h2>
-    <input id="regUser" placeholder="New Username"><br><br>
-    <input id="regPass" type="password" placeholder="New Password"><br><br>
-    <input id="regPass2" type="password" placeholder="Confirm Password"><br><br>
-    <button class="btn btn-red" onclick="register()">Create Account</button>
-    <br><br>
-    <div class="small">Have account? <span class="switch-link" onclick="showLogin()">Back to login</span></div>
-  </div>
-</div>
-
-<!-- ===== APP ===== -->
-<div id="app" style="display:none">
-
+<!-- ===== TOPBAR ===== -->
 <div class="topbar">
   <div class="hambtn" id="menuBtn">☰</div>
-  <div class="brand">MK Power Pro</div>
+  <div class="brand">Mk Power Solutions</div>
+  <div style="margin-left:10px">Welcome MUNNA, 👋</div>
   <div class="top-actions">
-    <div id="whoami" class="small"></div>
-    <button class="btn btn-red" onclick="logout()">Logout</button>
+    <button class="btn btn-red" onclick="go('repair')">Repair</button>
+    <div class="pill">MUNNA KHAN</div>
   </div>
 </div>
 
 <div class="app">
+
+<!-- ===== SIDEBAR ===== -->
 <aside class="sidebar" id="sidebar">
   <div class="company">Navigation</div>
   <div class="nav">
-    <div class="nav-item" data-go="dashboard">Dashboard</div>
-    <div class="nav-item" data-go="products">Products</div>
-    <div class="nav-item" data-go="contacts">Contacts</div>
-    <div class="nav-item" data-go="addSale">Add Sale</div>
-    <div class="nav-item" data-go="sales">All Sales</div>
-    <div class="nav-item" data-go="addQuotation">Add Quotation</div>
-    <div class="nav-item" data-go="quotations">Quotations</div>
-    <div class="nav-item" data-go="settings">Settings</div>
+
+    <div class="nav-item" data-go="dashboard">🏠 Home</div>
+
+    <div class="nav-item toggle">👥 Contacts ▸</div>
+    <div class="sub">
+      <div data-go="contacts">Customers</div>
+      <div data-go="importContacts">Import Contacts</div>
+    </div>
+
+    <div class="nav-item toggle">📦 Products ▸</div>
+    <div class="sub">
+      <div data-go="products">List Products</div>
+      <div data-go="addProduct">Add Product</div>
+      <div data-go="importProducts">Import Products</div>
+    </div>
+
+    <div class="nav-item" data-go="repair">🛠 Repair</div>
+
+    <div class="nav-item toggle">🧾 Purchases ▸</div>
+    <div class="sub">
+      <div data-go="purchases">List Purchases</div>
+      <div data-go="addPurchase">Add Purchase</div>
+    </div>
+
+    <div class="nav-item toggle">💰 Sell ▸</div>
+    <div class="sub">
+      <div data-go="sales">All Sales</div>
+      <div data-go="addSale">Add Sale</div>
+      <div data-go="addQuotation">Add Quotation</div>
+      <div data-go="quotations">All Quotation List</div>
+    </div>
+
+    <div class="nav-item" data-go="settings">⚙ Settings</div>
+
   </div>
 </aside>
 
+<!-- ===== CONTENT ===== -->
 <main class="content" id="content">
 
+<!-- DASHBOARD -->
 <section id="dashboard" class="page active">
+  <div class="card">
+    <b>Dashboard</b><div class="muted">Live overview (demo)</div>
+  </div>
+
   <div class="grid">
-    <div class="card c4"><h3 id="kSales">0</h3>Total Sales</div>
-    <div class="card c4"><h3 id="kQuotes">0</h3>Total Quotations</div>
-    <div class="card c4"><h3 id="kStock">0</h3>Total Stock Qty</div>
-    <div class="card c12"><canvas id="salesChart"></canvas></div>
+    <div class="card c4"><div class="kpi" id="kJobs">5</div>Total job sheets</div>
+    <div class="card c4"><div class="kpi" id="kProducts">3</div>Products</div>
+    <div class="card c4"><div class="kpi" id="kContacts">3</div>Contacts</div>
+
+    <div class="card c6"><canvas id="chart1"></canvas></div>
+    <div class="card c6"><canvas id="chart2"></canvas></div>
   </div>
 </section>
 
-<section id="products" class="page">
-  <div class="card">
-    <h3>Add Product</h3>
-    <div class="row">
-      <input id="pSku" placeholder="SKU">
-      <input id="pName" placeholder="Name">
-    </div><br>
-    <div class="row">
-      <input id="pStock" type="number" placeholder="Stock">
-      <input id="pPrice" type="number" placeholder="Price">
-    </div><br>
-    <button class="btn btn-red" onclick="addProduct()">Save Product</button>
-  </div>
-  <div class="card"><table><thead><tr><th>SKU</th><th>Name</th><th>Stock</th><th>Price</th></tr></thead><tbody id="prodBody"></tbody></table></div>
-</section>
-
+<!-- CONTACTS -->
 <section id="contacts" class="page">
+  <div class="card"><b>Contacts</b></div>
   <div class="card">
-    <h3>Add Contact</h3>
-    <div class="row">
-      <input id="cName" placeholder="Name">
-      <input id="cPhone" placeholder="Phone">
-    </div><br>
-    <button class="btn btn-red" onclick="addContact()">Save Contact</button>
-  </div>
-  <div class="card"><table><thead><tr><th>Name</th><th>Phone</th></tr></thead><tbody id="contactBody"></tbody></table></div>
-</section>
-
-<section id="addSale" class="page">
-  <div class="card">
-    <h3>New Sale</h3>
-    <div class="row">
-      <select id="saleCustomer"></select>
-      <input id="saleDate" type="datetime-local">
-    </div><br>
-    <div class="row">
-      <select id="saleProduct"></select>
-      <input id="saleQty" type="number" value="1">
-    </div><br>
-    <input type="file" id="saleFile"><br><br>
-    <button class="btn btn-outline" onclick="addSaleItem()">Add Item</button>
-    <table><thead><tr><th>Item</th><th>Qty</th><th>Sub</th></tr></thead><tbody id="saleItems"></tbody></table>
-    <h3>Total: <span id="saleTotal">0</span></h3>
-    <button class="btn btn-red" onclick="saveSale()">Save Sale</button>
+    <table><thead><tr><th>ID</th><th>Name</th><th>Type</th><th>Phone</th></tr></thead>
+      <tbody id="contactsBody"></tbody></table>
   </div>
 </section>
 
+<!-- PRODUCTS -->
+<section id="products" class="page">
+  <div class="card"><b>Products</b></div>
+  <div class="card">
+    <table><thead><tr><th>ID</th><th>SKU</th><th>Name</th><th>Stock</th><th>Price</th></tr></thead>
+      <tbody id="productsBody"></tbody></table>
+  </div>
+</section>
+
+<!-- ADD PRODUCT -->
+<section id="addProduct" class="page">
+  <div class="card"><b>Add Product</b></div>
+  <div class="card">
+    <form id="productForm">
+      <div class="row">
+        <input placeholder="SKU" id="sku" required>
+        <input placeholder="Name" id="name" required>
+      </div>
+      <div class="row">
+        <input type="number" placeholder="Stock" id="stock" required>
+        <input type="number" placeholder="Price" id="price" required>
+      </div>
+      <br><button class="btn btn-red">Save</button>
+    </form>
+  </div>
+</section>
+
+<!-- SALES LIST -->
 <section id="sales" class="page">
-  <div class="card"><table><thead><tr><th>Invoice</th><th>Customer</th><th>Total</th><th></th></tr></thead><tbody id="salesBody"></tbody></table></div>
-</section>
-
-<section id="addQuotation" class="page">
+  <div class="card"><b>All Sales</b></div>
   <div class="card">
-    <h3>New Quotation</h3>
-    <div class="row">
-      <select id="quoteCustomer"></select>
-      <input id="quoteDate" type="datetime-local">
-    </div><br>
-    <div class="row">
-      <select id="quoteProduct"></select>
-      <input id="quoteQty" type="number" value="1">
-    </div><br>
-    <button class="btn btn-outline" onclick="addQuoteItem()">Add Item</button>
-    <table><tbody id="quoteItems"></tbody></table>
-    <h3>Total: <span id="quoteTotal">0</span></h3>
-    <button class="btn btn-red" onclick="saveQuote()">Save Quotation</button>
+    <div class="actions-row" style="margin-bottom:8px">
+      <button class="btn" onclick="clearAll('sales')">Clear all sales</button>
+      <div class="small-muted">Saved locally in browser</div>
+    </div>
+    <table>
+      <thead><tr><th>ID</th><th>Customer</th><th>Date</th><th>Items</th><th>Total</th><th>Status</th><th>Actions</th></tr></thead>
+      <tbody id="salesBody"></tbody>
+    </table>
   </div>
 </section>
 
+<!-- QUOTATIONS LIST -->
 <section id="quotations" class="page">
-  <div class="card"><table><thead><tr><th>Quote</th><th>Customer</th><th>Total</th></tr></thead><tbody id="quoteBody"></tbody></table></div>
+  <div class="card"><b>All Quotations</b></div>
+  <div class="card">
+    <div class="actions-row" style="margin-bottom:8px">
+      <button class="btn" onclick="clearAll('quotations')">Clear all quotations</button>
+      <div class="small-muted">Saved locally in browser</div>
+    </div>
+    <table>
+      <thead><tr><th>ID</th><th>Customer</th><th>Date</th><th>Items</th><th>Total</th><th>Status</th><th>Actions</th></tr></thead>
+      <tbody id="quotationsBody"></tbody>
+    </table>
+  </div>
 </section>
 
+<!-- ADD SALE FORM -->
+<section id="addSale" class="page">
+  <div class="card"><b>Add Sale</b><div class="muted">Fill and click Save to store sale</div></div>
+  <div class="card">
+    <form id="saleForm">
+      <div class="form-section row">
+        <input id="saleCustomer" placeholder="Customer (Walk-in / choose)"/>
+        <input id="saleDate" type="datetime-local" />
+      </div>
+
+      <div class="form-section">
+        <input id="saleEngineBrand" placeholder="Engine Brand (optional)"/>
+      </div>
+
+      <div class="form-section">
+        <div style="display:flex;gap:8px;">
+          <select id="productSelect"></select>
+          <input id="productQty" type="number" min="1" value="1" style="width:100px" />
+          <input id="productPrice" type="number" min="0" step="0.01" value="0" style="width:120px" />
+          <button type="button" class="btn" id="addItemBtn">Add item</button>
+        </div>
+
+        <table class="items-table" id="itemsTable">
+          <thead><tr><th>SKU / Name</th><th>Qty</th><th>Unit</th><th>Subtotal</th><th></th></tr></thead>
+          <tbody></tbody>
+        </table>
+
+        <div class="total-row">
+          <div class="small-muted">Discount %</div>
+          <input id="saleDiscount" type="number" min="0" max="100" value="0" style="width:80px" />
+          <div style="width:20px"></div>
+          <div class="text-right"><strong>Total:</strong> <span id="saleTotal">0.00</span></div>
+        </div>
+      </div>
+
+      <div class="form-section row">
+        <select id="saleStatus">
+          <option value="Completed">Completed</option>
+          <option value="Pending" selected>Pending</option>
+        </select>
+        <input id="saleInvoice" placeholder="Invoice No (optional)"/>
+      </div>
+
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-red" type="submit">Save Sale</button>
+        <button type="button" class="btn" onclick="go('sales')">Cancel</button>
+      </div>
+    </form>
+  </div>
+</section>
+
+<!-- ADD QUOTATION FORM -->
+<section id="addQuotation" class="page">
+  <div class="card"><b>Add Quotation</b><div class="muted">Fill and click Save to store quotation</div></div>
+  <div class="card">
+    <form id="quoteForm">
+      <div class="form-section row">
+        <input id="quoteCustomer" placeholder="Customer (Walk-in / choose)"/>
+        <input id="quoteDate" type="datetime-local" />
+      </div>
+
+      <div class="form-section">
+        <input id="quoteEngineBrand" placeholder="Engine Brand (optional)"/>
+      </div>
+
+      <div class="form-section">
+        <div style="display:flex;gap:8px;">
+          <select id="productSelectQ"></select>
+          <input id="productQtyQ" type="number" min="1" value="1" style="width:100px" />
+          <input id="productPriceQ" type="number" min="0" step="0.01" value="0" style="width:120px" />
+          <button type="button" class="btn" id="addItemBtnQ">Add item</button>
+        </div>
+
+        <table class="items-table" id="itemsTableQ">
+          <thead><tr><th>SKU / Name</th><th>Qty</th><th>Unit</th><th>Subtotal</th><th></th></tr></thead>
+          <tbody></tbody>
+        </table>
+
+        <div class="total-row">
+          <div class="small-muted">Discount %</div>
+          <input id="quoteDiscount" type="number" min="0" max="100" value="0" style="width:80px" />
+          <div style="width:20px"></div>
+          <div class="text-right"><strong>Total:</strong> <span id="quoteTotal">0.00</span></div>
+        </div>
+      </div>
+
+      <div class="form-section row">
+        <select id="quoteStatus">
+          <option value="Sent">Sent</option>
+          <option value="Draft" selected>Draft</option>
+        </select>
+        <input id="quoteRef" placeholder="Reference (optional)"/>
+      </div>
+
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-red" type="submit">Save Quotation</button>
+        <button type="button" class="btn" onclick="go('quotations')">Cancel</button>
+      </div>
+    </form>
+  </div>
+</section>
+
+<!-- REPAIR -->
+<section id="repair" class="page">
+  <div class="card"><b>Repair Job Sheets</b></div>
+  <div class="card">
+    <button class="btn btn-red" onclick="alert('Add job sheet form here')">Add Job Sheet</button>
+  </div>
+</section>
+
+<!-- SETTINGS -->
 <section id="settings" class="page">
-  <div class="card small">GitHub / Server sync requires backend API.</div>
+  <div class="card"><b>Settings</b><div class="muted">System configuration demo</div></div>
 </section>
 
 </main>
 </div>
+
+<!-- IMPORT MODAL -->
+<div class="modal" id="modal">
+  <div class="modal-box">
+    <b>Import CSV</b><br><br>
+    <input type="file"><br><br>
+    <button class="btn btn-red" onclick="closeModal()">Upload</button>
+  </div>
 </div>
 
+<div id="toast" class="toast"></div>
+
 <script>
-/* ================= USERS ================= */
-let users = JSON.parse(localStorage.getItem('pro_users')||'[]');
-if(users.length===0){
-  users.push({user:'admin',pass:'1234'});
-  localStorage.setItem('pro_users',JSON.stringify(users));
+/* ===== SIDEBAR TOGGLE ===== */
+const sidebar=document.getElementById('sidebar');
+const content=document.getElementById('content');
+document.getElementById('menuBtn').onclick=()=>{
+  sidebar.classList.toggle('hide');
+  content.classList.toggle('full');
 }
 
-function showRegister(){loginBox.style.display='none';registerBox.style.display='block';}
-function showLogin(){registerBox.style.display='none';loginBox.style.display='block';}
+/* ===== MENU OPEN ===== */
+document.querySelectorAll('.toggle').forEach(t=>{
+  t.onclick=()=>t.classList.toggle('open');
+});
 
-function register(){
-  const u=regUser.value.trim();
-  const p=regPass.value;
-  const p2=regPass2.value;
-  if(!u||!p) return alert('Fill all fields');
-  if(p!==p2) return alert('Passwords not match');
-  if(users.find(x=>x.user===u)) return alert('Username exists');
-  users.push({user:u,pass:p});
-  localStorage.setItem('pro_users',JSON.stringify(users));
-  alert('Account created — please login');
-  showLogin();
+/* ===== ROUTING ===== */
+function go(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  const el=document.getElementById(id);
+  if(el) el.classList.add('active');
+  if(window.innerWidth<900){sidebar.classList.add('hide');content.classList.add('full');}
+  // run draws for pages that need updates
+  if(id==='contacts') drawContacts();
+  if(id==='products') drawProducts();
+  if(id==='sales') drawSalesList();
+  if(id==='quotations') drawQuotationsList();
 }
 
-function login(){
-  const u=loginUser.value.trim();
-  const p=loginPass.value;
-  const ok = users.find(x=>x.user===u && x.pass===p);
-  if(!ok) return alert('Username or password invalid');
-  localStorage.setItem('pro_session',u);
-  startApp(u);
+document.querySelectorAll('[data-go]').forEach(el=>{
+  el.onclick=()=>go(el.dataset.go);
+});
+
+/* ===== DEMO DATA ===== */
+let contacts=[
+  {id:1,name:'ABC Traders',type:'Customer',phone:'0170000001'},
+  {id:2,name:'XYZ Supply',type:'Supplier',phone:'0170000002'},
+  {id:3,name:'Rahim & Sons',type:'Customer',phone:'0170000003'}
+];
+
+let products=[
+  {id:1,sku:'LF-16112',name:'Lube Oil Filter',stock:40,price:12, unit:'pcs'},
+  {id:2,sku:'KSB433',name:'Mechanical Seal',stock:15,price:35, unit:'pcs'},
+  {id:3,sku:'12128936',name:'Air Filter',stock:8,price:9, unit:'pcs'}
+];
+
+// load saved sales/quotations from localStorage
+const LS_SALES = 'mk_sales_v1';
+const LS_QUOTES = 'mk_quotes_v1';
+
+function loadSaved(key){
+  try{
+    const raw = localStorage.getItem(key);
+    return raw ? JSON.parse(raw) : [];
+  }catch(e){ return []; }
+}
+function saveSaved(key, arr){
+  localStorage.setItem(key, JSON.stringify(arr));
 }
 
-function logout(){localStorage.removeItem('pro_session');location.reload();}
+let sales = loadSaved(LS_SALES);
+let quotations = loadSaved(LS_QUOTES);
 
-function startApp(u){
-  loginWrap.style.display='none';
-  app.style.display='block';
-  whoami.textContent='User: '+u;
-  init();
+/* ===== DRAW CONTACTS & PRODUCTS ===== */
+function drawContacts(){
+  contactsBody.innerHTML='';
+  contacts.forEach(c=>{
+    contactsBody.innerHTML+=`<tr><td>${c.id}</td><td>${c.name}</td><td>${c.type}</td><td>${c.phone}</td></tr>`
+  });
+  document.getElementById('kContacts').textContent=contacts.length;
 }
 
-const sessionUser = localStorage.getItem('pro_session');
-if(sessionUser){ startApp(sessionUser); }
-
-/* ===== NAV ===== */
-menuBtn.onclick=()=>{sidebar.classList.toggle('hide');content.classList.toggle('full');}
-document.querySelectorAll('[data-go]').forEach(x=>x.onclick=()=>go(x.dataset.go));
-function go(id){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.getElementById(id).classList.add('active');}
-
-/* ===== STORAGE ===== */
-const db={
- products: JSON.parse(localStorage.getItem('pro_products')||'[]'),
- contacts: JSON.parse(localStorage.getItem('pro_contacts')||'[]'),
- sales: JSON.parse(localStorage.getItem('pro_sales')||'[]'),
- quotes: JSON.parse(localStorage.getItem('pro_quotes')||'[]')
-};
-function saveDB(){
- localStorage.setItem('pro_products',JSON.stringify(db.products));
- localStorage.setItem('pro_contacts',JSON.stringify(db.contacts));
- localStorage.setItem('pro_sales',JSON.stringify(db.sales));
- localStorage.setItem('pro_quotes',JSON.stringify(db.quotes));
+function drawProducts(){
+  productsBody.innerHTML='';
+  products.forEach(p=>{
+    productsBody.innerHTML+=`<tr><td>${p.id}</td><td>${p.sku}</td><td>${p.name}</td><td>${p.stock}</td><td>${p.price}</td></tr>`
+  });
+  document.getElementById('kProducts').textContent=products.length;
 }
 
-/* ===== INIT ===== */
-function init(){drawProducts();drawContacts();refreshSelects();drawSales();drawQuotes();drawKPIs();}
-
-/* ===== PRODUCTS ===== */
-function addProduct(){
- if(!pSku.value) return;
- db.products.push({sku:pSku.value,name:pName.value,stock:+pStock.value,price:+pPrice.value});
- saveDB();drawProducts();refreshSelects();
+/* ===== Populate product selects ===== */
+function populateProductSelects(){
+  const sel = document.getElementById('productSelect');
+  const selQ = document.getElementById('productSelectQ');
+  [sel, selQ].forEach(s=>{
+    s.innerHTML = '';
+    products.forEach(p=>{
+      const opt = document.createElement('option');
+      opt.value = p.id;
+      opt.textContent = `${p.sku} — ${p.name}`;
+      s.appendChild(opt);
+    });
+  });
+  // set default price when selection changes
+  setProductPriceFromSelect('productSelect','productPrice');
+  setProductPriceFromSelect('productSelectQ','productPriceQ');
 }
-function drawProducts(){prodBody.innerHTML=db.products.map(p=>`<tr><td>${p.sku}</td><td>${p.name}</td><td>${p.stock}</td><td>${p.price}</td></tr>`).join('');}
-
-/* ===== CONTACTS ===== */
-function addContact(){ if(!cName.value) return; db.contacts.push({name:cName.value,phone:cPhone.value}); saveDB();drawContacts();refreshSelects(); }
-function drawContacts(){contactBody.innerHTML=db.contacts.map(c=>`<tr><td>${c.name}</td><td>${c.phone}</td></tr>`).join('');}
-
-/* ===== SELECTS ===== */
-function refreshSelects(){
- saleCustomer.innerHTML = quoteCustomer.innerHTML = db.contacts.map((c,i)=>`<option value="${i}">${c.name}</option>`).join('');
- saleProduct.innerHTML = quoteProduct.innerHTML = db.products.map((p,i)=>`<option value="${i}">${p.sku} — ${p.name}</option>`).join('');
+function setProductPriceFromSelect(selectId, priceInputId){
+  const sel = document.getElementById(selectId);
+  const priceInput = document.getElementById(priceInputId);
+  if(!sel || !priceInput) return;
+  const p = products.find(pp => pp.id === +sel.value);
+  priceInput.value = p ? p.price : 0;
 }
+document.addEventListener('change', (e)=>{
+  if(e.target && e.target.id === 'productSelect') setProductPriceFromSelect('productSelect','productPrice');
+  if(e.target && e.target.id === 'productSelectQ') setProductPriceFromSelect('productSelectQ','productPriceQ');
+});
 
-/* ===== SALES ===== */
-let saleItemsArr=[];
-function addSaleItem(){
- const p=db.products[saleProduct.value]; if(!p) return;
- const q=+saleQty.value||1;
- saleItemsArr.push({sku:p.sku,name:p.name,qty:q,sub:q*p.price});
- saleItems.innerHTML=saleItemsArr.map(i=>`<tr><td>${i.name}</td><td>${i.qty}</td><td>${i.sub}</td></tr>`).join('');
- saleTotal.textContent=saleItemsArr.reduce((a,b)=>a+b.sub,0);
-}
-function nextInv(){let n=+localStorage.getItem('inv_seq')||1000;n++;localStorage.setItem('inv_seq',n);return 'INV-'+n}
-async function saveSale(){
- if(!saleItemsArr.length) return alert('Add item');
- const f=saleFile.files[0];
- let file64=null;
- if(f){file64=await to64(f);} 
- db.sales.push({invoice:nextInv(),cust:db.contacts[saleCustomer.value]?.name||'',total:+saleTotal.textContent,items:saleItemsArr,file:file64});
- saleItemsArr=[];saleItems.innerHTML='';saleTotal.textContent=0;
- saveDB();drawSales();drawKPIs();
- alert('Sale saved');
-}
-function drawSales(){salesBody.innerHTML=db.sales.map(s=>`<tr><td>${s.invoice}</td><td>${s.cust}</td><td>${s.total}</td><td><button onclick="pdfSale('${s.invoice}')">PDF</button></td></tr>`).join('');}
-
-/* ===== QUOTES ===== */
-let quoteItemsArr=[];
-function addQuoteItem(){
- const p=db.products[quoteProduct.value]; if(!p) return;
- const q=+quoteQty.value||1;
- quoteItemsArr.push({name:p.name,qty:q,sub:q*p.price});
- quoteItems.innerHTML=quoteItemsArr.map(i=>`<tr><td>${i.name}</td><td>${i.qty}</td><td>${i.sub}</td></tr>`).join('');
- quoteTotal.textContent=quoteItemsArr.reduce((a,b)=>a+b.sub,0);
-}
-function nextQt(){let n=+localStorage.getItem('qt_seq')||500;n++;localStorage.setItem('qt_seq',n);return 'QT-'+n}
-function saveQuote(){
- if(!quoteItemsArr.length) return alert('Add item');
- db.quotes.push({no:nextQt(),cust:db.contacts[quoteCustomer.value]?.name||'',total:+quoteTotal.textContent});
- quoteItemsArr=[];quoteItems.innerHTML='';quoteTotal.textContent=0;
- saveDB();drawQuotes();drawKPIs();
- alert('Quotation saved');
-}
-function drawQuotes(){quoteBody.innerHTML=db.quotes.map(q=>`<tr><td>${q.no}</td><td>${q.cust}</td><td>${q.total}</td></tr>`).join('');}
-
-/* ===== PDF ===== */
-function pdfSale(inv){
- const s=db.sales.find(x=>x.invoice===inv); if(!s) return;
- const {jsPDF}=window.jspdf;const d=new jsPDF();
- d.text('Invoice '+inv,20,20);
- d.text('Customer: '+s.cust,20,30);
- let y=40;
- s.items.forEach(i=>{d.text(i.name+' x'+i.qty,20,y);d.text(String(i.sub),150,y);y+=8});
- d.text('Total '+s.total,20,y+10);
- d.save(inv+'.pdf');
+/* ===== Items handling for sale and quotation ===== */
+function createItemRow(item){
+  const tr = document.createElement('tr');
+  tr.innerHTML = `<td>${item.sku} — ${escapeHtml(item.name)}</td>
+    <td>${item.qty}</td>
+    <td>${item.unit||'pcs'}</td>
+    <td>${formatMoney(item.subtotal)}</td>
+    <td><button class="icon-btn" data-action="remove">✕</button></td>`;
+  tr.itemData = item;
+  return tr;
 }
 
-/* ===== KPIs ===== */
-let chart;
-function drawKPIs(){
- kSales.textContent=db.sales.length;
- kQuotes.textContent=db.quotes.length;
- kStock.textContent=db.products.reduce((a,b)=>a+Number(b.stock||0),0);
- if(chart) chart.destroy();
- chart=new Chart(document.getElementById('salesChart'),{type:'bar',data:{labels:['Sales','Quotes'],datasets:[{data:[db.sales.length,db.quotes.length]}]}});
+function addItemToTable(tblBody, item){
+  tblBody.appendChild(createItemRow(item));
 }
 
-/* ===== FILE ===== */
-function to64(f){return new Promise(r=>{const fr=new FileReader();fr.onload=()=>r(fr.result);fr.readAsDataURL(f);});}
+function computeTotalFromTbody(tbody, discountInput){
+  let total = 0;
+  tbody.querySelectorAll('tr').forEach(r=>{
+    total += (r.itemData ? r.itemData.subtotal : 0);
+  });
+  const disc = Number(discountInput.value) || 0;
+  if(disc > 0) total = total * (1 - Math.min(100, disc)/100);
+  return round2(total);
+}
+
+/* ===== SALE FORM EVENTS ===== */
+const saleForm = document.getElementById('saleForm');
+const itemsTableBody = document.querySelector('#itemsTable tbody');
+const addItemBtn = document.getElementById('addItemBtn');
+
+addItemBtn.addEventListener('click', ()=>{
+  const pid = +document.getElementById('productSelect').value;
+  const qty = Math.max(1, Number(document.getElementById('productQty').value || 1));
+  const price = Number(document.getElementById('productPrice').value || 0);
+  const p = products.find(x=>x.id===pid);
+  if(!p){ showToast('Select a valid product'); return; }
+  const item = { product_id:p.id, sku:p.sku, name:p.name, qty:qty, unit:p.unit||'pcs', unit_price:price, subtotal: round2(qty*price) };
+  addItemToTable(itemsTableBody, item);
+  updateSaleTotal();
+});
+
+itemsTableBody.addEventListener('click', (e)=>{
+  if(e.target.dataset.action === 'remove'){
+    const tr = e.target.closest('tr');
+    if(tr) tr.remove();
+    updateSaleTotal();
+  }
+});
+
+function updateSaleTotal(){
+  const total = computeTotalFromTbody(itemsTableBody, document.getElementById('saleDiscount'));
+  document.getElementById('saleTotal').textContent = formatMoney(total);
+}
+document.getElementById('saleDiscount').addEventListener('input', updateSaleTotal);
+
+saleForm.addEventListener('submit', (e)=>{
+  e.preventDefault();
+  // gather sale data
+  const items = [];
+  itemsTableBody.querySelectorAll('tr').forEach(tr=>{
+    if(tr.itemData) items.push(tr.itemData);
+  });
+  if(items.length === 0){ showToast('Add at least one item'); return; }
+  const sale = {
+    id: Date.now(),
+    customer: document.getElementById('saleCustomer').value || 'Walk-In Customer',
+    date: document.getElementById('saleDate').value || new Date().toISOString(),
+    engine_brand: document.getElementById('saleEngineBrand').value || '',
+    items: items,
+    discount_percent: Number(document.getElementById('saleDiscount').value||0),
+    total: Number(document.getElementById('saleTotal').textContent||0),
+    status: document.getElementById('saleStatus').value,
+    invoice: document.getElementById('saleInvoice').value || ''
+  };
+  sales.push(sale);
+  saveSaved(LS_SALES, sales);
+  showToast('Sale saved');
+  // reset form
+  saleForm.reset();
+  itemsTableBody.innerHTML = '';
+  document.getElementById('saleTotal').textContent = '0.00';
+  go('sales');
+});
+
+/* ===== QUOTE FORM EVENTS ===== */
+const quoteForm = document.getElementById('quoteForm');
+const itemsTableBodyQ = document.querySelector('#itemsTableQ tbody');
+const addItemBtnQ = document.getElementById('addItemBtnQ');
+
+addItemBtnQ.addEventListener('click', ()=>{
+  const pid = +document.getElementById('productSelectQ').value;
+  const qty = Math.max(1, Number(document.getElementById('productQtyQ').value || 1));
+  const price = Number(document.getElementById('productPriceQ').value || 0);
+  const p = products.find(x=>x.id===pid);
+  if(!p){ showToast('Select a valid product'); return; }
+  const item = { product_id:p.id, sku:p.sku, name:p.name, qty:qty, unit:p.unit||'pcs', unit_price:price, subtotal: round2(qty*price) };
+  addItemToTable(itemsTableBodyQ, item);
+  updateQuoteTotal();
+});
+
+itemsTableBodyQ.addEventListener('click', (e)=>{
+  if(e.target.dataset.action === 'remove'){
+    const tr = e.target.closest('tr');
+    if(tr) tr.remove();
+    updateQuoteTotal();
+  }
+});
+
+function updateQuoteTotal(){
+  const total = computeTotalFromTbody(itemsTableBodyQ, document.getElementById('quoteDiscount'));
+  document.getElementById('quoteTotal').textContent = formatMoney(total);
+}
+document.getElementById('quoteDiscount').addEventListener('input', updateQuoteTotal);
+
+quoteForm.addEventListener('submit', (e)=>{
+  e.preventDefault();
+  const items = [];
+  itemsTableBodyQ.querySelectorAll('tr').forEach(tr=>{
+    if(tr.itemData) items.push(tr.itemData);
+  });
+  if(items.length === 0){ showToast('Add at least one item'); return; }
+  const quote = {
+    id: Date.now(),
+    customer: document.getElementById('quoteCustomer').value || 'Walk-In Customer',
+    date: document.getElementById('quoteDate').value || new Date().toISOString(),
+    engine_brand: document.getElementById('quoteEngineBrand').value || '',
+    items: items,
+    discount_percent: Number(document.getElementById('quoteDiscount').value||0),
+    total: Number(document.getElementById('quoteTotal').textContent||0),
+    status: document.getElementById('quoteStatus').value,
+    reference: document.getElementById('quoteRef').value || ''
+  };
+  quotations.push(quote);
+  saveSaved(LS_QUOTES, quotations);
+  showToast('Quotation saved');
+  quoteForm.reset();
+  itemsTableBodyQ.innerHTML = '';
+  document.getElementById('quoteTotal').textContent = '0.00';
+  go('quotations');
+});
+
+/* ===== Render sales & quotations lists ===== */
+function drawSalesList(){
+  const tbody = document.getElementById('salesBody');
+  tbody.innerHTML = '';
+  sales.forEach(s=>{
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td>${s.id}</td>
+      <td>${escapeHtml(s.customer)}</td>
+      <td>${formatDate(s.date)}</td>
+      <td>${s.items.length}</td>
+      <td>${formatMoney(s.total)}</td>
+      <td>${escapeHtml(s.status)}</td>
+      <td>
+        <button class="btn" onclick="viewSale(${s.id})">View</button>
+        <button class="btn" onclick="deleteSale(${s.id})">Delete</button>
+      </td>`;
+    tbody.appendChild(tr);
+  });
+}
+
+function drawQuotationsList(){
+  const tbody = document.getElementById('quotationsBody');
+  tbody.innerHTML = '';
+  quotations.forEach(q=>{
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td>${q.id}</td>
+      <td>${escapeHtml(q.customer)}</td>
+      <td>${formatDate(q.date)}</td>
+      <td>${q.items.length}</td>
+      <td>${formatMoney(q.total)}</td>
+      <td>${escapeHtml(q.status)}</td>
+      <td>
+        <button class="btn" onclick="viewQuote(${q.id})">View</button>
+        <button class="btn" onclick="deleteQuote(${q.id})">Delete</button>
+      </td>`;
+    tbody.appendChild(tr);
+  });
+}
+
+/* ===== View / Delete handlers ===== */
+function viewSale(id){
+  const s = sales.find(x=>x.id===id);
+  if(!s){ showToast('Sale not found'); return; }
+  // simple modal-like display
+  alert(`Sale ${s.id}\nCustomer: ${s.customer}\nDate: ${formatDate(s.date)}\nTotal: ${formatMoney(s.total)}\nItems:\n${s.items.map(it=>`${it.qty} x ${it.sku} ${it.name} = ${formatMoney(it.subtotal)}`).join('\n')}`);
+}
+function viewQuote(id){
+  const q = quotations.find(x=>x.id===id);
+  if(!q){ showToast('Quotation not found'); return; }
+  alert(`Quotation ${q.id}\nCustomer: ${q.customer}\nDate: ${formatDate(q.date)}\nTotal: ${formatMoney(q.total)}\nItems:\n${q.items.map(it=>`${it.qty} x ${it.sku} ${it.name} = ${formatMoney(it.subtotal)}`).join('\n')}`);
+}
+
+function deleteSale(id){
+  if(!confirm('Delete this sale?')) return;
+  sales = sales.filter(s=>s.id!==id);
+  saveSaved(LS_SALES, sales);
+  drawSalesList();
+  showToast('Sale deleted');
+}
+function deleteQuote(id){
+  if(!confirm('Delete this quotation?')) return;
+  quotations = quotations.filter(q=>q.id!==id);
+  saveSaved(LS_QUOTES, quotations);
+  drawQuotationsList();
+  showToast('Quotation deleted');
+}
+
+function clearAll(type){
+  if(!confirm('Clear all items?')) return;
+  if(type==='sales'){
+    sales = []; saveSaved(LS_SALES, sales); drawSalesList(); showToast('Sales cleared');
+  } else {
+    quotations = []; saveSaved(LS_QUOTES, quotations); drawQuotationsList(); showToast('Quotations cleared');
+  }
+}
+
+/* ===== Small helpers ===== */
+function formatMoney(n){ return (Math.round(n*100)/100).toFixed(2); }
+function round2(n){ return Math.round(n*100)/100; }
+function formatDate(d){
+  try{
+    const dt = new Date(d);
+    if(isNaN(dt)) return d;
+    return dt.toLocaleString();
+  }catch(e){ return d; }
+}
+function escapeHtml(s){ return String(s).replace(/[&<>"']/g, (m)=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[m])); }
+
+function showToast(text, t=2200){
+  const toast = document.getElementById('toast');
+  toast.textContent = text;
+  toast.classList.add('show');
+  setTimeout(()=>toast.classList.remove('show'), t);
+}
+
+/* ===== Utilities on load ===== */
+populateProductSelects();
+drawContacts();
+drawProducts();
+drawSalesList();
+drawQuotationsList();
+
+/* ===== CHARTS (demo) ===== */
+new Chart(document.getElementById('chart1'),{type:'line',data:{labels:['Jan','Feb','Mar','Apr','May'],datasets:[{data:[3,7,5,9,6]}]},options:{plugins:{legend:{display:false}}}});
+new Chart(document.getElementById('chart2'),{type:'doughnut',data:{labels:['DEUTZ','DEIF','CAT'],datasets:[{data:[5,3,4]}]}});
+
+/* ===== IMPORT MODAL ===== */
+function closeModal(){modal.classList.remove('show')}
 </script>
+
 </body>
 </html>
