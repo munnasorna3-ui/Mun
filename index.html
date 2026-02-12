@@ -1,0 +1,364 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>MK Power Solutions — Pro</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.3.0/dist/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+<style>
+:root{
+  --red:#8b1f1f;
+  --red2:#6e1a1a;
+  --bg:#f2f4f8;
+  --card:#ffffff;
+  --text:#222;
+  --muted:#777;
+  --sidebar:280px;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;font-family:Poppins,Arial;background:var(--bg);color:var(--text)}
+
+.topbar{position:fixed;top:0;left:0;right:0;height:64px;background:linear-gradient(180deg,var(--red),var(--red2));color:#fff;display:flex;align-items:center;gap:12px;padding:0 14px;z-index:1000}
+.hambtn{width:44px;height:44px;border-radius:8px;background:rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;cursor:pointer}
+.brand{font-weight:700}
+.top-actions{margin-left:auto;display:flex;gap:8px;align-items:center}
+.btn{border:none;border-radius:8px;padding:10px 14px;cursor:pointer}
+.btn-red{background:#fff;color:#7a1c1c;font-weight:600}
+.btn-outline{background:transparent;border:1px solid #7a1c1c;color:#7a1c1c}
+
+.app{display:flex;padding-top:64px;min-height:100vh}
+.sidebar{position:fixed;top:64px;bottom:0;left:0;width:var(--sidebar);background:#fff;border-right:1px solid #e6e6e6;overflow:auto;transition:.25s}
+.sidebar.hide{transform:translateX(-100%)}
+.content{flex:1;margin-left:var(--sidebar);padding:18px;transition:.25s}
+.content.full{margin-left:0}
+@media(max-width:900px){.sidebar{width:85%}.content{margin-left:0}}
+
+.company{background:linear-gradient(90deg,var(--red),#9b2a2a);color:#fff;padding:12px 16px;font-weight:600}
+.nav{padding:10px}
+.nav-item{padding:10px;border-radius:8px;cursor:pointer}
+.nav-item:hover{background:#f3f3f3}
+
+.card{background:var(--card);border-radius:10px;padding:16px;margin-bottom:16px;box-shadow:0 2px 6px rgba(0,0,0,.05)}
+.grid{display:grid;grid-template-columns:repeat(12,1fr);gap:16px}
+.c4{grid-column:span 4}
+.c6{grid-column:span 6}
+.c12{grid-column:span 12}
+@media(max-width:900px){.c4,.c6{grid-column:span 12}}
+
+input,select,textarea{padding:10px;border-radius:8px;border:1px solid #ddd;width:100%}
+table{width:100%;border-collapse:collapse}
+th,td{padding:10px;border-bottom:1px solid #eee;font-size:14px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media(max-width:700px){.row{grid-template-columns:1fr}}
+
+.page{display:none}
+.page.active{display:block}
+.small{font-size:12px;color:#666}
+
+.login-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center}
+.login-box{max-width:440px;width:95%;background:#fff;padding:24px;border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,.08)}
+.login-box h2{margin-top:0}
+.switch-link{color:#7a1c1c;cursor:pointer;font-size:14px;text-decoration:underline}
+</style>
+</head>
+
+<body>
+
+<!-- ===== LOGIN / REGISTER ===== -->
+<div id="loginWrap" class="login-wrap">
+  <div class="login-box" id="loginBox">
+    <h2>MK Power Pro — Login</h2>
+    <input id="loginUser" placeholder="Username"><br><br>
+    <input id="loginPass" type="password" placeholder="Password"><br><br>
+    <button class="btn btn-red" onclick="login()">Login</button>
+    <br><br>
+    <div class="small">No account? <span class="switch-link" onclick="showRegister()">Create account</span></div>
+    <div class="small">Default first-time login: <b>admin / 1234</b></div>
+  </div>
+
+  <div class="login-box" id="registerBox" style="display:none">
+    <h2>Create Account</h2>
+    <input id="regUser" placeholder="New Username"><br><br>
+    <input id="regPass" type="password" placeholder="New Password"><br><br>
+    <input id="regPass2" type="password" placeholder="Confirm Password"><br><br>
+    <button class="btn btn-red" onclick="register()">Create Account</button>
+    <br><br>
+    <div class="small">Have account? <span class="switch-link" onclick="showLogin()">Back to login</span></div>
+  </div>
+</div>
+
+<!-- ===== APP ===== -->
+<div id="app" style="display:none">
+
+<div class="topbar">
+  <div class="hambtn" id="menuBtn">☰</div>
+  <div class="brand">MK Power Pro</div>
+  <div class="top-actions">
+    <div id="whoami" class="small"></div>
+    <button class="btn btn-red" onclick="logout()">Logout</button>
+  </div>
+</div>
+
+<div class="app">
+<aside class="sidebar" id="sidebar">
+  <div class="company">Navigation</div>
+  <div class="nav">
+    <div class="nav-item" data-go="dashboard">Dashboard</div>
+    <div class="nav-item" data-go="products">Products</div>
+    <div class="nav-item" data-go="contacts">Contacts</div>
+    <div class="nav-item" data-go="addSale">Add Sale</div>
+    <div class="nav-item" data-go="sales">All Sales</div>
+    <div class="nav-item" data-go="addQuotation">Add Quotation</div>
+    <div class="nav-item" data-go="quotations">Quotations</div>
+    <div class="nav-item" data-go="settings">Settings</div>
+  </div>
+</aside>
+
+<main class="content" id="content">
+
+<section id="dashboard" class="page active">
+  <div class="grid">
+    <div class="card c4"><h3 id="kSales">0</h3>Total Sales</div>
+    <div class="card c4"><h3 id="kQuotes">0</h3>Total Quotations</div>
+    <div class="card c4"><h3 id="kStock">0</h3>Total Stock Qty</div>
+    <div class="card c12"><canvas id="salesChart"></canvas></div>
+  </div>
+</section>
+
+<section id="products" class="page">
+  <div class="card">
+    <h3>Add Product</h3>
+    <div class="row">
+      <input id="pSku" placeholder="SKU">
+      <input id="pName" placeholder="Name">
+    </div><br>
+    <div class="row">
+      <input id="pStock" type="number" placeholder="Stock">
+      <input id="pPrice" type="number" placeholder="Price">
+    </div><br>
+    <button class="btn btn-red" onclick="addProduct()">Save Product</button>
+  </div>
+  <div class="card"><table><thead><tr><th>SKU</th><th>Name</th><th>Stock</th><th>Price</th></tr></thead><tbody id="prodBody"></tbody></table></div>
+</section>
+
+<section id="contacts" class="page">
+  <div class="card">
+    <h3>Add Contact</h3>
+    <div class="row">
+      <input id="cName" placeholder="Name">
+      <input id="cPhone" placeholder="Phone">
+    </div><br>
+    <button class="btn btn-red" onclick="addContact()">Save Contact</button>
+  </div>
+  <div class="card"><table><thead><tr><th>Name</th><th>Phone</th></tr></thead><tbody id="contactBody"></tbody></table></div>
+</section>
+
+<section id="addSale" class="page">
+  <div class="card">
+    <h3>New Sale</h3>
+    <div class="row">
+      <select id="saleCustomer"></select>
+      <input id="saleDate" type="datetime-local">
+    </div><br>
+    <div class="row">
+      <select id="saleProduct"></select>
+      <input id="saleQty" type="number" value="1">
+    </div><br>
+    <input type="file" id="saleFile"><br><br>
+    <button class="btn btn-outline" onclick="addSaleItem()">Add Item</button>
+    <table><thead><tr><th>Item</th><th>Qty</th><th>Sub</th></tr></thead><tbody id="saleItems"></tbody></table>
+    <h3>Total: <span id="saleTotal">0</span></h3>
+    <button class="btn btn-red" onclick="saveSale()">Save Sale</button>
+  </div>
+</section>
+
+<section id="sales" class="page">
+  <div class="card"><table><thead><tr><th>Invoice</th><th>Customer</th><th>Total</th><th></th></tr></thead><tbody id="salesBody"></tbody></table></div>
+</section>
+
+<section id="addQuotation" class="page">
+  <div class="card">
+    <h3>New Quotation</h3>
+    <div class="row">
+      <select id="quoteCustomer"></select>
+      <input id="quoteDate" type="datetime-local">
+    </div><br>
+    <div class="row">
+      <select id="quoteProduct"></select>
+      <input id="quoteQty" type="number" value="1">
+    </div><br>
+    <button class="btn btn-outline" onclick="addQuoteItem()">Add Item</button>
+    <table><tbody id="quoteItems"></tbody></table>
+    <h3>Total: <span id="quoteTotal">0</span></h3>
+    <button class="btn btn-red" onclick="saveQuote()">Save Quotation</button>
+  </div>
+</section>
+
+<section id="quotations" class="page">
+  <div class="card"><table><thead><tr><th>Quote</th><th>Customer</th><th>Total</th></tr></thead><tbody id="quoteBody"></tbody></table></div>
+</section>
+
+<section id="settings" class="page">
+  <div class="card small">GitHub / Server sync requires backend API.</div>
+</section>
+
+</main>
+</div>
+</div>
+
+<script>
+/* ================= USERS ================= */
+let users = JSON.parse(localStorage.getItem('pro_users')||'[]');
+if(users.length===0){
+  users.push({user:'admin',pass:'1234'});
+  localStorage.setItem('pro_users',JSON.stringify(users));
+}
+
+function showRegister(){loginBox.style.display='none';registerBox.style.display='block';}
+function showLogin(){registerBox.style.display='none';loginBox.style.display='block';}
+
+function register(){
+  const u=regUser.value.trim();
+  const p=regPass.value;
+  const p2=regPass2.value;
+  if(!u||!p) return alert('Fill all fields');
+  if(p!==p2) return alert('Passwords not match');
+  if(users.find(x=>x.user===u)) return alert('Username exists');
+  users.push({user:u,pass:p});
+  localStorage.setItem('pro_users',JSON.stringify(users));
+  alert('Account created — please login');
+  showLogin();
+}
+
+function login(){
+  const u=loginUser.value.trim();
+  const p=loginPass.value;
+  const ok = users.find(x=>x.user===u && x.pass===p);
+  if(!ok) return alert('Username or password invalid');
+  localStorage.setItem('pro_session',u);
+  startApp(u);
+}
+
+function logout(){localStorage.removeItem('pro_session');location.reload();}
+
+function startApp(u){
+  loginWrap.style.display='none';
+  app.style.display='block';
+  whoami.textContent='User: '+u;
+  init();
+}
+
+const sessionUser = localStorage.getItem('pro_session');
+if(sessionUser){ startApp(sessionUser); }
+
+/* ===== NAV ===== */
+menuBtn.onclick=()=>{sidebar.classList.toggle('hide');content.classList.toggle('full');}
+document.querySelectorAll('[data-go]').forEach(x=>x.onclick=()=>go(x.dataset.go));
+function go(id){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.getElementById(id).classList.add('active');}
+
+/* ===== STORAGE ===== */
+const db={
+ products: JSON.parse(localStorage.getItem('pro_products')||'[]'),
+ contacts: JSON.parse(localStorage.getItem('pro_contacts')||'[]'),
+ sales: JSON.parse(localStorage.getItem('pro_sales')||'[]'),
+ quotes: JSON.parse(localStorage.getItem('pro_quotes')||'[]')
+};
+function saveDB(){
+ localStorage.setItem('pro_products',JSON.stringify(db.products));
+ localStorage.setItem('pro_contacts',JSON.stringify(db.contacts));
+ localStorage.setItem('pro_sales',JSON.stringify(db.sales));
+ localStorage.setItem('pro_quotes',JSON.stringify(db.quotes));
+}
+
+/* ===== INIT ===== */
+function init(){drawProducts();drawContacts();refreshSelects();drawSales();drawQuotes();drawKPIs();}
+
+/* ===== PRODUCTS ===== */
+function addProduct(){
+ if(!pSku.value) return;
+ db.products.push({sku:pSku.value,name:pName.value,stock:+pStock.value,price:+pPrice.value});
+ saveDB();drawProducts();refreshSelects();
+}
+function drawProducts(){prodBody.innerHTML=db.products.map(p=>`<tr><td>${p.sku}</td><td>${p.name}</td><td>${p.stock}</td><td>${p.price}</td></tr>`).join('');}
+
+/* ===== CONTACTS ===== */
+function addContact(){ if(!cName.value) return; db.contacts.push({name:cName.value,phone:cPhone.value}); saveDB();drawContacts();refreshSelects(); }
+function drawContacts(){contactBody.innerHTML=db.contacts.map(c=>`<tr><td>${c.name}</td><td>${c.phone}</td></tr>`).join('');}
+
+/* ===== SELECTS ===== */
+function refreshSelects(){
+ saleCustomer.innerHTML = quoteCustomer.innerHTML = db.contacts.map((c,i)=>`<option value="${i}">${c.name}</option>`).join('');
+ saleProduct.innerHTML = quoteProduct.innerHTML = db.products.map((p,i)=>`<option value="${i}">${p.sku} — ${p.name}</option>`).join('');
+}
+
+/* ===== SALES ===== */
+let saleItemsArr=[];
+function addSaleItem(){
+ const p=db.products[saleProduct.value]; if(!p) return;
+ const q=+saleQty.value||1;
+ saleItemsArr.push({sku:p.sku,name:p.name,qty:q,sub:q*p.price});
+ saleItems.innerHTML=saleItemsArr.map(i=>`<tr><td>${i.name}</td><td>${i.qty}</td><td>${i.sub}</td></tr>`).join('');
+ saleTotal.textContent=saleItemsArr.reduce((a,b)=>a+b.sub,0);
+}
+function nextInv(){let n=+localStorage.getItem('inv_seq')||1000;n++;localStorage.setItem('inv_seq',n);return 'INV-'+n}
+async function saveSale(){
+ if(!saleItemsArr.length) return alert('Add item');
+ const f=saleFile.files[0];
+ let file64=null;
+ if(f){file64=await to64(f);} 
+ db.sales.push({invoice:nextInv(),cust:db.contacts[saleCustomer.value]?.name||'',total:+saleTotal.textContent,items:saleItemsArr,file:file64});
+ saleItemsArr=[];saleItems.innerHTML='';saleTotal.textContent=0;
+ saveDB();drawSales();drawKPIs();
+ alert('Sale saved');
+}
+function drawSales(){salesBody.innerHTML=db.sales.map(s=>`<tr><td>${s.invoice}</td><td>${s.cust}</td><td>${s.total}</td><td><button onclick="pdfSale('${s.invoice}')">PDF</button></td></tr>`).join('');}
+
+/* ===== QUOTES ===== */
+let quoteItemsArr=[];
+function addQuoteItem(){
+ const p=db.products[quoteProduct.value]; if(!p) return;
+ const q=+quoteQty.value||1;
+ quoteItemsArr.push({name:p.name,qty:q,sub:q*p.price});
+ quoteItems.innerHTML=quoteItemsArr.map(i=>`<tr><td>${i.name}</td><td>${i.qty}</td><td>${i.sub}</td></tr>`).join('');
+ quoteTotal.textContent=quoteItemsArr.reduce((a,b)=>a+b.sub,0);
+}
+function nextQt(){let n=+localStorage.getItem('qt_seq')||500;n++;localStorage.setItem('qt_seq',n);return 'QT-'+n}
+function saveQuote(){
+ if(!quoteItemsArr.length) return alert('Add item');
+ db.quotes.push({no:nextQt(),cust:db.contacts[quoteCustomer.value]?.name||'',total:+quoteTotal.textContent});
+ quoteItemsArr=[];quoteItems.innerHTML='';quoteTotal.textContent=0;
+ saveDB();drawQuotes();drawKPIs();
+ alert('Quotation saved');
+}
+function drawQuotes(){quoteBody.innerHTML=db.quotes.map(q=>`<tr><td>${q.no}</td><td>${q.cust}</td><td>${q.total}</td></tr>`).join('');}
+
+/* ===== PDF ===== */
+function pdfSale(inv){
+ const s=db.sales.find(x=>x.invoice===inv); if(!s) return;
+ const {jsPDF}=window.jspdf;const d=new jsPDF();
+ d.text('Invoice '+inv,20,20);
+ d.text('Customer: '+s.cust,20,30);
+ let y=40;
+ s.items.forEach(i=>{d.text(i.name+' x'+i.qty,20,y);d.text(String(i.sub),150,y);y+=8});
+ d.text('Total '+s.total,20,y+10);
+ d.save(inv+'.pdf');
+}
+
+/* ===== KPIs ===== */
+let chart;
+function drawKPIs(){
+ kSales.textContent=db.sales.length;
+ kQuotes.textContent=db.quotes.length;
+ kStock.textContent=db.products.reduce((a,b)=>a+Number(b.stock||0),0);
+ if(chart) chart.destroy();
+ chart=new Chart(document.getElementById('salesChart'),{type:'bar',data:{labels:['Sales','Quotes'],datasets:[{data:[db.sales.length,db.quotes.length]}]}});
+}
+
+/* ===== FILE ===== */
+function to64(f){return new Promise(r=>{const fr=new FileReader();fr.onload=()=>r(fr.result);fr.readAsDataURL(f);});}
+</script>
+</body>
+</html>
